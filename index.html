@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unipass</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <canvas id="glass-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+  <div class="container glass">
+    <header class="top-bar">
+      <h1>🔑 Unipass</h1>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button id="changeMasterBtn" class="secondary" style="display:none;" title="Change Master Password">🔒 Change Master Password</button>
+        <button id="themeToggle" title="Toggle dark mode">🌗</button>
+      </div>
+    </header>
+
+    <main id="dashboard" class="screen">
+      <div class="search-sort">
+        <input type="text" id="searchInput" placeholder="Search app or website..." />
+        <select id="sortSelect">
+          <option value="az">A → Z</option>
+          <option value="recent">Recently Added</option>
+          <option value="modified">Last Modified</option>
+        </select>
+      </div>
+      <button class="fab" onclick="showScreen('addPasswordScreen')" title="Add new password">＋ Add New</button>
+      <h2 id="historyHeading">Saved Passwords</h2>
+      <div id="vaultCards"></div>
+    </main>
+
+    <section id="addPasswordScreen" class="screen hidden">
+      <h2>Add or Edit Password</h2>
+      <form id="addPasswordForm">
+        <input type="text" id="appName" placeholder="Website/App Name" required aria-label="Website or App Name" />
+        <input type="text" id="email" placeholder="Username or Email" required aria-label="Username or Email" />
+        <input type="text" id="genPassword" placeholder="Password" required aria-label="Password" />
+        <textarea id="notes" placeholder="Notes (optional)" aria-label="Notes (optional)"></textarea>
+
+        <div class="slider-row">
+          <input type="range" id="lengthSlider" min="4" max="32" value="12" aria-label="Password Length" />
+          <span id="sliderValue" class="slider-value-circle">12</span>
+        </div>
+        <div class="generator-options">
+          <label><input type="checkbox" id="includeNumbers" checked aria-label="Include Numbers" /> Numbers</label>
+          <label><input type="checkbox" id="includeSymbols" checked aria-label="Include Symbols" /> Symbols</label>
+          <label><input type="checkbox" id="includeUppercase" checked aria-label="Include Uppercase" /> Uppercase</label>
+        </div>
+
+        <button type="button" onclick="generateNewPassword()">🔄 Generate</button>
+        <button type="button" onclick="copyGeneratedPassword()">📋 Copy</button>
+
+        <div class="form-actions">
+          <button type="submit" class="primary">💾 Save</button>
+          <button type="button" class="secondary" onclick="showScreen('dashboard')">✖ Cancel</button>
+        </div>
+      </form>
+    </section>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+  <div id="masterPasswordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="masterPasswordTitle">
+    <div class="modal-content">
+      <h2 id="masterPasswordTitle">Unlock Unipass</h2>
+      <form id="masterPasswordForm">
+        <input type="password" id="masterPasswordInput" placeholder="Enter master password" required aria-label="Master Password" autocomplete="current-password" />
+        <input type="password" id="masterPasswordConfirm" placeholder="Confirm master password" required aria-label="Confirm Master Password" autocomplete="new-password" style="display:none;" />
+        <div class="form-actions">
+          <button type="submit" class="primary" id="masterPasswordSubmit">Unlock</button>
+        </div>
+        <div id="masterPasswordError" style="color:var(--danger);margin-top:0.5rem;min-height:1.2em;"></div>
+        <div style="margin-top:0.7rem;text-align:center;">
+          <a href="#" id="forgotMasterLink" style="color:var(--accent);font-size:0.98em;">Forgot Master Password?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="changeMasterModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="changeMasterTitle">
+    <div class="modal-content">
+      <h2 id="changeMasterTitle">Change Master Password</h2>
+      <form id="changeMasterForm">
+        <input type="password" id="currentMasterInput" placeholder="Current master password" required aria-label="Current Master Password" autocomplete="current-password" />
+        <input type="password" id="newMasterInput" placeholder="New master password" required aria-label="New Master Password" autocomplete="new-password" />
+        <input type="password" id="newMasterConfirm" placeholder="Confirm new master password" required aria-label="Confirm New Master Password" autocomplete="new-password" />
+        <div class="form-actions">
+          <button type="submit" class="primary">Change</button>
+          <button type="button" class="secondary" id="cancelChangeMaster">Cancel</button>
+        </div>
+        <div id="changeMasterError" style="color:var(--danger);margin-top:0.5rem;min-height:1.2em;"></div>
+      </form>
+    </div>
+  </div>
+  <button id="forceResetBtn" style="display:none;position:fixed;bottom:0.5rem;left:0.5rem;z-index:9999;">Force Reset (Dev Only)</button>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+</body>
+</html>
